@@ -1,0 +1,28 @@
+{
+  "variant": "v2_gate_part2",
+  "research": "v2",
+  "modifier_gate": true,
+  "summary": {
+    "n": 17,
+    "errors": 0,
+    "route_accuracy": 0.529,
+    "route_acceptable": 0.706,
+    "category_accuracy": 0.333,
+    "escalation_accuracy": 1.0,
+    "support_cited": 0.615,
+    "support_retrieved": 0.962,
+    "groundedness": 0.867,
+    "context_relevance": 0.555,
+    "faithfulness": 0.7,
+    "hallucination_rate": 0.013,
+    "case41_route": null,
+    "case41_support_cited": null,
+    "mean_cost_usd": 0.004,
+    "cost_per_100_runs_usd": 0.4,
+    "mean_tokens": 23438.471,
+    "mean_steps": 15.412,
+    "mean_tool_calls": 3.824,
+    "p50_latency_s": 15.84,
+    "p95_latency_s": 44.84
+  }
+}

@@ -1,0 +1,52 @@
+ Container tariff-dispute-triage-redis-1 Running 
+ Container tariff-dispute-triage-api-1 Running 
+ Container tariff-dispute-triage-postgres-1 Running 
+ Container tariff-dispute-triage-jaeger-1 Running 
+ Container tariff-dispute-triage-postgres-1 Waiting 
+ Container tariff-dispute-triage-redis-1 Waiting 
+ Container tariff-dispute-triage-redis-1 Healthy 
+ Container tariff-dispute-triage-postgres-1 Healthy 
+ Container tariff-dispute-triage-api-1 Waiting 
+ Container tariff-dispute-triage-api-1 Healthy 
+ Container tariff-dispute-triage-eval-run-2c275fd1f1fd Creating 
+ Container tariff-dispute-triage-eval-run-2c275fd1f1fd Created 
+{"id": "S10", "route": "escalated-to-officer", "expected_route": "revision-recommended", "route_correct": false, "support_cited": 0.0, "error": null}
+{"id": "S11", "route": "escalated-to-officer", "expected_route": "revision-recommended", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S12", "route": "bill-stands-with-reason", "expected_route": "bill-stands-with-reason", "route_correct": true, "support_cited": 0.5, "error": null}
+{"id": "S13", "route": "revision-recommended", "expected_route": "site-inspection-required", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S14", "route": "site-inspection-required", "expected_route": "site-inspection-required", "route_correct": true, "support_cited": 1.0, "error": null}
+{"id": "S15", "route": "escalated-to-officer", "expected_route": "bill-stands-with-reason", "route_correct": false, "support_cited": 0.0, "error": null}
+{"id": "S16", "route": "revision-recommended", "expected_route": "revision-recommended", "route_correct": true, "support_cited": 0.0, "error": null}
+{"id": "S17", "route": "revision-recommended", "expected_route": "escalated-to-officer", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S18", "route": "escalated-to-officer", "expected_route": "escalated-to-officer", "route_correct": true, "support_cited": null, "error": null}
+{"id": "S19", "route": "escalated-to-officer", "expected_route": "escalated-to-officer", "route_correct": true, "support_cited": null, "error": null}
+{"id": "S20", "route": "escalated-to-officer", "expected_route": "escalated-to-officer", "route_correct": true, "support_cited": null, "error": null}
+{"id": "S21", "route": "escalated-to-officer", "expected_route": "escalated-to-officer", "route_correct": true, "support_cited": 1.0, "error": null}
+{"id": "S22", "route": "site-inspection-required", "expected_route": "bill-stands-with-reason", "route_correct": false, "support_cited": 0.5, "error": null}
+{"id": "S23", "route": "escalated-to-officer", "expected_route": "revision-recommended", "route_correct": false, "support_cited": 0.0, "error": null}
+{"id": "S24", "route": "escalated-to-officer", "expected_route": "bill-stands-with-reason", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S25", "route": "revision-recommended", "expected_route": "revision-recommended", "route_correct": true, "support_cited": 1.0, "error": null}
+{"id": "S26", "route": "escalated-to-officer", "expected_route": "escalated-to-officer", "route_correct": true, "support_cited": null, "error": null}
+{
+  "n": 17,
+  "errors": 0,
+  "route_accuracy": 0.529,
+  "route_acceptable": 0.706,
+  "category_accuracy": 0.333,
+  "escalation_accuracy": 1.0,
+  "support_cited": 0.615,
+  "support_retrieved": 0.962,
+  "groundedness": 0.867,
+  "context_relevance": 0.555,
+  "faithfulness": 0.7,
+  "hallucination_rate": 0.013,
+  "case41_route": null,
+  "case41_support_cited": null,
+  "mean_cost_usd": 0.004,
+  "cost_per_100_runs_usd": 0.4,
+  "mean_tokens": 23438.471,
+  "mean_steps": 15.412,
+  "mean_tool_calls": 3.824,
+  "p50_latency_s": 15.84,
+  "p95_latency_s": 44.84
+}

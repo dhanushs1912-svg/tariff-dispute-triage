@@ -1,0 +1,23 @@
+# Corpus manifest. Every document indexed by the ingest pipeline must be listed here.
+# sha256 is checked at ingest time; a mismatch stops the run.
+documents:
+  - doc_id: kerc_to_2025
+    title: KERC Combined Tariff Order 2025 (BESCOM, MESCOM, CESC, HESCOM, GESCOM)
+    short: Tariff Order 2025
+    kind: tariff_order
+    file: kerc_combined_tariff_order_2025.pdf
+    version: "Order dated 27.03.2025, control period FY2025-26 to FY2027-28"
+    sha256: 9b1c746ecb4e21d70582f74ab8e6aee9a112d6b3ff9a5dc335595f726886c950
+    source: "Karnataka Electricity Regulatory Commission; copy retrieved from the OpenCity mirror of the KERC Combined Tariff Order 2025"
+    retrieved: "2026-11-04"
+    covers_escoms: [BESCOM, MESCOM, CESC, HESCOM, GESCOM]
+  - doc_id: kerc_cos_2006
+    title: Conditions of Supply of Electricity of Distribution Licensees in the State of Karnataka (with I and II Amendments)
+    short: Conditions of Supply
+    kind: supply_code
+    file: kerc_conditions_of_supply_2006.pdf
+    version: "Notified 17.06.2006, consolidated with 1st (20.03.2008) and 2nd (22.07.2010) amendments"
+    sha256: a625669b200385d7f43d11e4b0718920b95d09957a608a2a3bc5d9fe0671a4b0
+    source: "Karnataka Electricity Regulatory Commission website, Regulations page (Conditions of Supply section)"
+    retrieved: "2026-11-04"
+    covers_escoms: [BESCOM, MESCOM, CESC, HESCOM, GESCOM]

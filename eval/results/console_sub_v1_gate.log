@@ -1,0 +1,43 @@
+ Container tariff-dispute-triage-api-1 Running 
+ Container tariff-dispute-triage-redis-1 Running 
+ Container tariff-dispute-triage-postgres-1 Running 
+ Container tariff-dispute-triage-jaeger-1 Running 
+ Container tariff-dispute-triage-redis-1 Waiting 
+ Container tariff-dispute-triage-postgres-1 Waiting 
+ Container tariff-dispute-triage-redis-1 Healthy 
+ Container tariff-dispute-triage-postgres-1 Healthy 
+ Container tariff-dispute-triage-api-1 Waiting 
+ Container tariff-dispute-triage-api-1 Healthy 
+ Container tariff-dispute-triage-eval-run-e40c64531294 Creating 
+ Container tariff-dispute-triage-eval-run-e40c64531294 Created 
+{"id": "S01", "route": "escalated-to-officer", "expected_route": "bill-stands-with-reason", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S02", "route": "escalated-to-officer", "expected_route": "revision-recommended", "route_correct": false, "support_cited": 0.0, "error": null}
+{"id": "S04", "route": "escalated-to-officer", "expected_route": "revision-recommended", "route_correct": false, "support_cited": 0.0, "error": null}
+{"id": "S07", "route": "escalated-to-officer", "expected_route": "revision-recommended", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S12", "route": "bill-stands-with-reason", "expected_route": "bill-stands-with-reason", "route_correct": true, "support_cited": 0.5, "error": null}
+{"id": "S13", "route": "revision-recommended", "expected_route": "site-inspection-required", "route_correct": false, "support_cited": 1.0, "error": null}
+{"id": "S22", "route": "bill-stands-with-reason", "expected_route": "bill-stands-with-reason", "route_correct": true, "support_cited": 0.5, "error": null}
+{"id": "S24", "route": "escalated-to-officer", "expected_route": "bill-stands-with-reason", "route_correct": false, "support_cited": 1.0, "error": null}
+{
+  "n": 8,
+  "errors": 0,
+  "route_accuracy": 0.25,
+  "route_acceptable": 0.5,
+  "category_accuracy": 0.286,
+  "escalation_accuracy": null,
+  "support_cited": 0.625,
+  "support_retrieved": 0.875,
+  "groundedness": 0.69,
+  "context_relevance": 0.429,
+  "faithfulness": 0.429,
+  "hallucination_rate": 0.0,
+  "case41_route": "escalated-to-officer",
+  "case41_support_cited": 1.0,
+  "mean_cost_usd": 0.006,
+  "cost_per_100_runs_usd": 0.6,
+  "mean_tokens": 30714.375,
+  "mean_steps": 22.25,
+  "mean_tool_calls": 5.625,
+  "p50_latency_s": 22.32,
+  "p95_latency_s": 32.1
+}

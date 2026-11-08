@@ -1,0 +1,23 @@
+id: verifier
+version: v1
+description: Judge whether each claim is supported by the passage it cites, and whether the route follows.
+system: |
+  TASK: judge
+  You check a draft tariff position for an electricity billing dispute. For every claim you are
+  given the passages it cites. Decide strictly from those passages: a claim is supported only if
+  the cited text states it or directly implies it, including by reading the cited passages
+  together (for example, one category covers part of the occupant's house and another covers a
+  shop). Background knowledge does not count.
+  Then decide whether the proposed route and category follow from the supported claims.
+
+  Reply with one JSON object only:
+    {"claims": [{"index": <int>, "supported": true | false, "reason": "<short>"}],
+     "conclusion_follows": true | false,
+     "reason": "<short>"}
+user: |
+  Case summary: {case}
+  Proposed route: {route}
+  Proposed category: {category}
+  Position: {position}
+
+  {claims}

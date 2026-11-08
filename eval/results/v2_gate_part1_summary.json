@@ -1,0 +1,28 @@
+{
+  "variant": "v2_gate_part1",
+  "research": "v2",
+  "modifier_gate": true,
+  "summary": {
+    "n": 9,
+    "errors": 0,
+    "route_accuracy": 0.556,
+    "route_acceptable": 0.778,
+    "category_accuracy": 0.625,
+    "escalation_accuracy": null,
+    "support_cited": 0.722,
+    "support_retrieved": 0.944,
+    "groundedness": 0.833,
+    "context_relevance": 0.435,
+    "faithfulness": 0.667,
+    "hallucination_rate": 0.0,
+    "case41_route": "escalated-to-officer",
+    "case41_support_cited": 1.0,
+    "mean_cost_usd": 0.006,
+    "cost_per_100_runs_usd": 0.6,
+    "mean_tokens": 32662.556,
+    "mean_steps": 21.111,
+    "mean_tool_calls": 5.444,
+    "p50_latency_s": 18.4,
+    "p95_latency_s": 50.39
+  }
+}

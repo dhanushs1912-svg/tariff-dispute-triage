@@ -1,0 +1,230 @@
+{
+  "$id": "tariff_position.v1",
+  "$defs": {
+    "Citation": {
+      "properties": {
+        "chunk_id": {
+          "title": "Chunk Id",
+          "type": "string"
+        },
+        "doc_id": {
+          "title": "Doc Id",
+          "type": "string"
+        },
+        "doc_title": {
+          "title": "Doc Title",
+          "type": "string"
+        },
+        "locator": {
+          "title": "Locator",
+          "type": "string"
+        },
+        "quote": {
+          "title": "Quote",
+          "type": "string"
+        }
+      },
+      "required": [
+        "chunk_id",
+        "doc_id",
+        "doc_title",
+        "locator",
+        "quote"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Claim": {
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "citation_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Citation Ids",
+          "type": "array"
+        },
+        "supported": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supported"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "text",
+        "citation_ids"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "Escalation": {
+      "properties": {
+        "reason": {
+          "enum": [
+            "mixed_category",
+            "provisions_conflict",
+            "outside_corpus",
+            "insufficient_evidence",
+            "verification_failed",
+            "budget_exhausted",
+            "provider_unavailable",
+            "input_flagged",
+            "agent_failure",
+            "unauthorised_determination"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "explanation": {
+          "title": "Explanation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "explanation"
+      ],
+      "title": "Escalation",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "route": {
+      "enum": [
+        "bill-stands-with-reason",
+        "revision-recommended",
+        "site-inspection-required",
+        "escalated-to-officer"
+      ],
+      "title": "Route",
+      "type": "string"
+    },
+    "dispute_type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dispute Type"
+    },
+    "billed_category": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Billed Category"
+    },
+    "determined_category": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Determined Category"
+    },
+    "position": {
+      "title": "Position",
+      "type": "string"
+    },
+    "claims": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "citations": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Citation"
+      },
+      "title": "Citations",
+      "type": "array"
+    },
+    "escalation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Escalation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "verification": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Verification",
+      "type": "object"
+    },
+    "prompt_versions": {
+      "additionalProperties": true,
+      "default": {},
+      "title": "Prompt Versions",
+      "type": "object"
+    },
+    "cost_usd": {
+      "default": 0.0,
+      "title": "Cost Usd",
+      "type": "number"
+    },
+    "latency_ms": {
+      "default": 0,
+      "title": "Latency Ms",
+      "type": "integer"
+    },
+    "disclaimer": {
+      "default": "Recommendation only. This service never revises or recomputes a bill; the grievance officer makes the decision.",
+      "title": "Disclaimer",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "route",
+    "position"
+  ],
+  "title": "TariffPosition",
+  "type": "object"
+}

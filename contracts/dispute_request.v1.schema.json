@@ -1,0 +1,173 @@
+{
+  "$id": "dispute_request.v1",
+  "$defs": {
+    "ConnectionType": {
+      "enum": [
+        "LT",
+        "HT"
+      ],
+      "title": "ConnectionType",
+      "type": "string"
+    },
+    "DisputeType": {
+      "enum": [
+        "tariff_category",
+        "meter_accuracy",
+        "load_violation",
+        "arrears",
+        "disconnection",
+        "other"
+      ],
+      "title": "DisputeType",
+      "type": "string"
+    },
+    "Escom": {
+      "enum": [
+        "BESCOM",
+        "MESCOM",
+        "CESC",
+        "HESCOM",
+        "GESCOM",
+        "HRECS",
+        "MSEZ"
+      ],
+      "title": "Escom",
+      "type": "string"
+    },
+    "PremisesUse": {
+      "enum": [
+        "residential",
+        "commercial",
+        "industrial",
+        "agricultural",
+        "institutional",
+        "religious",
+        "other"
+      ],
+      "title": "PremisesUse",
+      "type": "string"
+    },
+    "TariffCategory": {
+      "enum": [
+        "LT-1",
+        "LT-2",
+        "LT-3(a)",
+        "LT-3(b)",
+        "LT-4(a)",
+        "LT-4(b)",
+        "LT-4(c)",
+        "LT-5",
+        "LT-6(a)",
+        "LT-6(b)",
+        "LT-6(c)",
+        "LT-7",
+        "HT-1",
+        "HT-2(a)",
+        "HT-2(b)",
+        "HT-2(c)(i)",
+        "HT-2(c)(ii)",
+        "HT-3",
+        "HT-4",
+        "HT-5",
+        "HT-6",
+        "HT-7"
+      ],
+      "title": "TariffCategory",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "account_number": {
+      "description": "Consumer RR / account number",
+      "pattern": "^[A-Z0-9][A-Z0-9/-]{3,23}$",
+      "title": "Account Number",
+      "type": "string"
+    },
+    "escom": {
+      "$ref": "#/$defs/Escom"
+    },
+    "connection_type": {
+      "$ref": "#/$defs/ConnectionType"
+    },
+    "billed_category": {
+      "$ref": "#/$defs/TariffCategory"
+    },
+    "sanctioned_load_kw": {
+      "exclusiveMinimum": 0,
+      "maximum": 20000,
+      "title": "Sanctioned Load Kw",
+      "type": "number"
+    },
+    "connected_load_kw": {
+      "anyOf": [
+        {
+          "maximum": 20000,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Connected Load Kw"
+    },
+    "premises_use": {
+      "items": {
+        "$ref": "#/$defs/PremisesUse"
+      },
+      "maxItems": 4,
+      "minItems": 1,
+      "title": "Premises Use",
+      "type": "array"
+    },
+    "claimed_dispute_type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/DisputeType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "bill_period_start": {
+      "format": "date",
+      "title": "Bill Period Start",
+      "type": "string"
+    },
+    "bill_period_end": {
+      "format": "date",
+      "title": "Bill Period End",
+      "type": "string"
+    },
+    "billed_amount_inr": {
+      "maximum": 100000000,
+      "minimum": 0,
+      "title": "Billed Amount Inr",
+      "type": "number"
+    },
+    "description": {
+      "maxLength": 2000,
+      "minLength": 20,
+      "title": "Description",
+      "type": "string"
+    }
+  },
+  "required": [
+    "account_number",
+    "escom",
+    "connection_type",
+    "billed_category",
+    "sanctioned_load_kw",
+    "premises_use",
+    "bill_period_start",
+    "bill_period_end",
+    "billed_amount_inr",
+    "description"
+  ],
+  "title": "DisputeRequest",
+  "type": "object"
+}
