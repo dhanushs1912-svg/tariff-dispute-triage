@@ -1,0 +1,25 @@
+{
+  "name": "tariff-dispute-triage",
+  "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "forwardPorts": [8000, 3000, 16686, 9090],
+  "portsAttributes": {
+    "8000": { "label": "Web client and API" },
+    "3000": { "label": "Grafana" },
+    "16686": { "label": "Jaeger" },
+    "9090": { "label": "Prometheus" }
+  },
+  "customizations": {
+    "codespaces": {
+      "openFiles": ["README.md"]
+    }
+  }
+}

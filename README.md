@@ -71,6 +71,22 @@ but the answers are canned. To get real answers, set these in `.env` and run
 Scale the research agent with `docker compose up -d --scale researcher=3`.
 Stop with `docker compose down`; add `-v` to also delete the data.
 
+### Without Docker on your machine: GitHub Codespaces
+
+If Docker Desktop will not install on your PC, run the whole stack in the browser instead.
+
+1. On the repository page, click **Code → Codespaces → Create codespace on main**. The Codespace
+   asks for a 4-core / 8 GB machine, because the stack runs 14 containers.
+2. Wait for setup to finish. It creates `.env` from `.env.example`. If you saved `EMBED_MODEL` as a
+   Codespaces secret (GitHub → Settings → Codespaces → Secrets), it is filled in for you;
+   otherwise set it in `.env` yourself.
+3. In the terminal: `docker compose up --build`.
+4. Open the **Ports** tab and click the globe icon next to 8000 (web client), 3000 (Grafana),
+   16686 (Jaeger) or 9090 (Prometheus).
+
+Every command in this README works the same inside the Codespace. Stop the Codespace when you are
+done (Codespaces → ⋯ → Stop), so it does not use up your free monthly hours.
+
 ## 2. Use the API
 
 ```bash
