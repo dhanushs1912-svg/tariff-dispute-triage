@@ -54,3 +54,13 @@ def test_chunk_ids_are_stable(chunks):
 def test_cross_references_extracted(chunks):
     lt4 = [c for c in chunks["kerc_to_2025"] if c.clause_ref.startswith("TO-LT-4") and "42.06" in c.text]
     assert lt4 and "COS-42.06" in lt4[0].refs
+
+
+def test_prompt_excerpt_keeps_the_activity_visible(chunks):
+    """The research prompt shortens passages; it must not cut off the deciding words (incident 9)."""
+    from triage.agents.researcher import PASSAGE_CHARS, fmt_passage
+
+    lt1 = find(chunks, "kerc_to_2025", "TO-LT-1", "a portion is used by the occupant")[0]
+    assert lt1.text.find("(e) Tailoring") > PASSAGE_CHARS
+    shown = fmt_passage({"chunk_id": lt1.chunk_id, "locator": lt1.locator, "text": lt1.text}, focus=["tailoring"])
+    assert "(e) Tailoring" in shown and "portion is used by the occupant" in shown

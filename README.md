@@ -145,16 +145,20 @@ python -m pip install -r requirements-dev.txt && python -m pytest -q
 
 ## 5. Load test
 
-The SLO was declared before any test: [docs/slo.md](docs/slo.md). Use the stub model:
-`LLM_BASE_URL` must point at `llm-stub`, which is the default.
+The SLO was declared before any test: [docs/slo.md](docs/slo.md). The load test must use the stub
+model, so it measures this system and not a provider's rate limits. `docker-compose.stub.yml` points
+the gateway at the stub without touching `.env`, so your real keys stay in place:
 
 ```bash
-docker compose up -d --scale researcher=1
-docker compose --profile tools run --rm -e RUN_LOG=runs_1worker.csv loadtest
-docker compose up -d --scale researcher=3
-docker compose --profile tools run --rm -e RUN_LOG=runs_3workers.csv loadtest
+docker compose -f docker-compose.yml -f docker-compose.stub.yml up -d --scale researcher=1
+docker compose -f docker-compose.yml -f docker-compose.stub.yml --profile tools run --rm --no-deps -e RUN_LOG=runs_1worker.csv loadtest
+docker compose -f docker-compose.yml -f docker-compose.stub.yml up -d --scale researcher=3
+docker compose -f docker-compose.yml -f docker-compose.stub.yml --profile tools run --rm --no-deps -e RUN_LOG=runs_3workers.csv loadtest
 python loadtest/analyze.py loadtest/results/runs_1worker.csv loadtest/results/runs_3workers.csv
+docker compose up -d --scale researcher=1     # back to the real model from .env
 ```
+
+`STAGES` sets the step load as `users:seconds` pairs (default `2:120,5:120,10:150,15:150,20:150,30:150`).
 
 Fixed load instead of the step load:
 

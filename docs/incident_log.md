@@ -127,3 +127,22 @@ Real failures met while building the system, newest last.
   3. Fewer and shorter passages in each prompt.
 - **Data:** only the first part of that pass is a valid measurement of the system. The pass is re-run
   in daily slices that fit the quota (`--only`).
+
+## 9. The research agent never saw "Tailoring" in LT-1 (18 Nov 2026)
+
+- **What happened:** in the demo rehearsal the 4.1 case escalated again (`verification_failed`). The
+  research agent cited LT-1 and LT-5 correctly, but claimed LT-1's list "does not include
+  tailoring" or covers only "artisans using motors up to 200 watts". The judge, which reads the full
+  passage, rejected the claim both times. The same error explains the 8 Nov escalation of S01.
+- **Cause:** our own token saving (incident 5). The research prompt showed each passage cut to its
+  first 550 characters. In the LT-1 chunk, "(e) Tailoring" starts at character 586, so the research
+  agent was shown items (a)–(d) and never (e), while the judge saw everything.
+- **Fix:** passages are no longer cut blindly. If a focus word (the consumer's activity, the words
+  the agent searched for) first appears beyond the cut, the prompt shows the heading plus a window
+  around it. The LT-1 passage now shows both "a portion is used by the occupant" and
+  "(e) Tailoring". Regression test: `test_prompt_excerpt_keeps_the_activity_visible`.
+- **Result:** the 4.1 case was answered correctly in two runs in a row: bill-stands-with-reason,
+  LT-1, citing LT-1 and LT-5, verified on the first attempt, 14.6–18.1 s, 14–21k tokens.
+- **Effect on reported numbers:** the 8 Nov evaluation (report section 5) ran with the bug. Its
+  scenarios whose deciding words sit late in a long passage are understated. We did not re-run the
+  full evaluation, to keep the free-tier quota for the demonstration.

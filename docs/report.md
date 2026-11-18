@@ -79,6 +79,12 @@ service are in [architecture.md](architecture.md#services-and-why-each-is-its-ow
   Gemini took over whenever all Groq models were at their per-minute cap. The results therefore
   describe the deployed system with its fallback chain, not one model.
 
+> **Note (18 Nov):** these results were measured before the fix in incident 9. Until then the
+> research prompt cut passages at 550 characters, which hid some deciding words (including
+> "(e) Tailoring" in LT-1) from the research agent. After the fix the 4.1 case passed in two
+> consecutive runs. The full evaluation was not re-run, to keep the free-tier quota for the
+> demonstration, so the figures below likely understate the current system.
+
 ### Main pass: prompt v2 with modifier gate, 26 scenarios
 
 | Metric | Value |
@@ -153,11 +159,85 @@ means better grounded claims), not the exact size.
 
 ## 6. SLO, load test, bottleneck, cost
 
-<!-- RESULTS:LOAD -->
-Load test results (stub model, 1 vs 3 researcher workers): to be added by Vidit.
+**SLO, declared before any test** ([slo.md](slo.md)): p95 of a complete run (submission to
+final result) <= 60 s at 10 concurrent runs, error rate < 1 %.
+
+**Method**
+- Locust, closed loop: each simulated user keeps exactly one dispute in flight. It submits, polls
+  every second until the result is ready, and records the end-to-end time. So users = concurrent
+  runs.
+- Model replaced by `llm-stub` (1.5 s ± 0.3 s per call) through `docker-compose.stub.yml`, so the
+  test measures our system, not the provider.
+- Step load: 2, 5, 10, 20 and 30 concurrent runs, held 90–150 s each.
+- Raw data: `loadtest/results/runs_1worker.csv`, `runs_3workers.csv`. Summary:
+  `python loadtest/analyze.py`. Run on 18 Nov 2026.
+
+**1 researcher worker**
+
+| Concurrent runs | Throughput (runs/s) | p50 | p95 | Errors | SLO |
+|---|---|---|---|---|---|
+| 2 | 0.17 | 11.1 s | 12.1 s | 0 | met |
+| 5 | 0.17 | 30.3 s | 31.4 s | 0 | met |
+| **10** | 0.17 | 59.7 s | **62.5 s** | 0 | **missed** |
+| 20 | 0.17 | 77.0 s | 121.4 s | 0 | missed |
+| 30 | 0.17 | 124.4 s | 138.6 s | 0 | missed |
+
+**3 researcher workers** (`docker compose up --scale researcher=3`)
+
+| Concurrent runs | Throughput (runs/s) | p50 | p95 | Errors | SLO |
+|---|---|---|---|---|---|
+| 2 | 0.25 | 9.1 s | 47.6 s* | 0 | met |
+| 5 | 0.48 | 9.1 s | 11.2 s | 0 | met |
+| **10** | 0.49 | 19.2 s | **21.2 s** | 0 | **met** |
+| 20 | 0.49 | 39.4 s | 41.5 s | 0 | met |
+| **30** | 0.49 | 60.7 s | **62.9 s** | 0 | **missed** |
+
+\* Two runs at the start waited behind jobs still queued from the previous test (the queue was not
+drained between tests); the other eight took 8–9 s.
+
+**Result against the target.**
+- With one worker the SLO is **missed at 10 concurrent runs** (p95 62.5 s).
+- With three workers it is **met at 10** (21.2 s) and at 20 (41.5 s), and first fails at **30**
+  (62.9 s). No errors in either test.
+
+**Effect of scaling.**
+- Throughput rose from 0.17 to 0.49 runs/s (×2.9 for ×3 workers).
+- p95 at 10 concurrent runs fell from 62.5 s to 21.2 s.
+
+**Bottleneck** (from Prometheus during each test):
+- **1 worker: the research worker.**
+  - The research queue reached 29 jobs; the verify queue stayed at 0.
+  - The researcher was busy 98 % of the time; the verifier 21 %.
+  - CPU was low everywhere (researcher 0.14 cores): the worker is not overloaded. It runs one job
+    at a time and spends most of it waiting on the model.
+- **Little's law fits.** Time in system = concurrent runs ÷ throughput, so
+  10 ÷ 0.17 ≈ 59 s (measured p50 59.7 s) and 30 ÷ 0.49 ≈ 61 s (measured p50 60.7 s). The workers'
+  throughput sets the latency.
+- **3 workers: still the researchers, with the verifier next.**
+  - Each researcher was 95 % busy and the research queue reached 26.
+  - The single verifier rose to 77 % busy, with 0.86 CPU cores, and its queue appeared (max 2).
+  - Most of the verifier's CPU is the sampled live quality scoring (MiniLM embeddings for context
+    relevance), which runs inside the verification job.
+- **Next steps:** more researchers would hit the verifier limit soon. The fix is to scale the
+  verifier too, or move live scoring off the critical path into its own job.
+
+**Caching (D7)**, measured on the stub with the same dispute:
+
+| | p50 | p95 | Model cost per run |
+|---|---|---|---|
+| Cache bypassed (`Cache-Control: no-cache`) | 8.1 s | 20.3 s | $0.0012 on the stub; **$0.005** on the real model (main pass mean) |
+| Whole-run cache hit | **14 ms** | 35 ms | **$0** |
+
+- A repeated identical dispute is answered about 580× faster and at no model cost.
+- Only verified answers and deterministic escalations are cached. Keys include the index and prompt
+  versions, so a corpus or prompt change cannot serve a stale answer.
+- The retrieval cache showed 867 hits to 2 misses in the load test. That figure is inflated because
+  the stub issues the same scripted queries every run, so it is not a real-world hit rate.
+- Rate limiting (20 submissions/min per client) did not trigger, because each simulated user has its
+  own client id.
 
 Measured on the real model during evaluation (8 Nov 2026):
-- p95 complete run of 45.3 s, inside the 60 s SLO, with one researcher and sequential cases.
+- p95 complete run of 45.3 s, with one researcher and cases run one at a time (not concurrent).
 - **Cost per 100 runs:** $0.50 at the list prices in `.env` ($0.15 / $0.60 per million input /
   output tokens). The free tier actually billed $0.
 - **Largest cost driver:** the research agent's `decide` calls, 87% of cost. They are almost all
@@ -184,7 +264,8 @@ Measured on the real model during evaluation (8 Nov 2026):
   - Half the calls fell through to the Gemini fallback.
 - **The gate's trade-off.** Forcing the agent to cite competing provisions made answers more
   complete but escalated more often (section 5).
-- **Research reasoning on the 4.1 case is not stable from run to run.** In the 7 Nov evaluation
-  run it was right, citing both LT-1 and LT-5. In the 8 Nov run the agent misread LT-1, and the
-  verifier caught it and escalated. The safety net works, but the answer itself varies. A stronger
-  model, or a higher reasoning effort, is the obvious next step and was beyond the free-tier quota.
+- **Our own token saving hid the answer from the agent** (incident 9). The research prompt cut
+  each passage to 550 characters, and in LT-1 "(e) Tailoring" starts at character 586. So the agent
+  sometimes "misread" LT-1, and the verifier correctly rejected it. We found this in the 18 Nov
+  rehearsal and fixed it with focus-aware excerpts. The 4.1 case then passed twice in a row, verified
+  on the first attempt. The 8 Nov evaluation numbers in section 5 were measured before this fix.

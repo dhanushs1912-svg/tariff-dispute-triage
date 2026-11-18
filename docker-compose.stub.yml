@@ -1,0 +1,18 @@
+# Override for load tests (D6): points the llm-gateway at the local stub model and disables the
+# fallback providers, without editing .env. Real provider settings stay in .env untouched.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.stub.yml up -d llm-gateway   # switch to stub
+#   docker compose up -d llm-gateway                                                     # back to .env settings
+services:
+  llm-gateway:
+    environment:
+      LLM_BASE_URL: http://llm-stub:8080/v1
+      LLM_API_KEY: ""
+      LLM_MODEL: stub-model
+      LLM_FALLBACK_BASE_URL: ""
+      LLM_FALLBACK_API_KEY: ""
+      LLM_FALLBACK_MODEL: ""
+      LLM_FALLBACK2_BASE_URL: ""
+      LLM_FALLBACK2_API_KEY: ""
+      LLM_FALLBACK2_MODEL: ""
+      LLM_REASONING_EFFORT: ""

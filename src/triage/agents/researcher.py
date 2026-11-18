@@ -134,15 +134,40 @@ def render_work(state: dict) -> str:
     """Each retrieved passage is shown once, in full, in one block; the history lists actions and
     passage ids only. Keeps each model call small without the agent losing what it has read."""
     retrieved = list(state.get("retrieved", {}).items())[-MAX_SHOWN_PASSAGES:]
-    block = "\n\n".join(fmt_passage({"chunk_id": cid, **p}) for cid, p in retrieved) or "(none yet)"
+    focus = focus_words(state)
+    block = "\n\n".join(fmt_passage({"chunk_id": cid, **p}, focus=focus) for cid, p in retrieved) or "(none yet)"
     history = "\n".join(state.get("scratch", [])[-20:]) or "(nothing yet)"
     return f"PASSAGES RETRIEVED SO FAR (cite only these ids):\n{block}\n\nHISTORY:\n{history}"
 
 
-def fmt_passage(p: dict, chars: int = PASSAGE_CHARS) -> str:
+def excerpt(text: str, chars: int, focus: list[str]) -> str:
+    """Shorten a passage for the prompt without hiding the part that matters: if a focus word (the
+    consumer's activity, words the agent searched for) first appears beyond the cut, show the
+    heading plus a window around it instead of only the start."""
+    if len(text) <= chars:
+        return text
+    low = text.lower()
+    hits = [i for i in (low.find(w) for w in focus if w) if i != -1]
+    if hits and min(hits) > chars - 80:
+        head = text[:120].rsplit(" ", 1)[0]
+        start = max(120, min(hits) - 380)
+        window = text[start:start + chars]
+        window = window.split(" ", 1)[-1].rsplit(" ", 1)[0]
+        return f"{head} ... {window} ..."
+    return text[:chars].rsplit(" ", 1)[0] + " ..."
+
+
+def focus_words(state: dict) -> list[str]:
+    words = str((state.get("intake") or {}).get("activity") or "").lower().replace("/", " ").replace("-", " ").split()
+    for q in state.get("queries", [])[-4:]:
+        words += str(q).lower().split()
+    return sorted({w.strip(".,()'\"") for w in words if len(w.strip(".,()'\"")) >= 5} - _GENERIC)
+
+
+def fmt_passage(p: dict, chars: int = PASSAGE_CHARS, focus: list[str] | None = None) -> str:
     text = p["text"]
     if len(text) > chars:
-        text = text[:chars].rsplit(" ", 1)[0] + " ..."
+        text = excerpt(text, chars, focus or [])
     flag = " [SUPERSEDED]" if p.get("superseded") else ""
     return f"[{p['chunk_id']}] {p['locator']}{flag}\n{text}"
 
