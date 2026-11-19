@@ -148,7 +148,10 @@ def _submit(request: Request, raw: bytes):
                                                           "status_url": f"/v1/runs/{run_id}", "result": result})
     with tracer().start_as_current_span("submit") as span:
         span.set_attribute("run_id", run_id)
-        db.create_run(run_id, cid, data, rhash, versions, inject_context(), current_trace_id())
+        # A run that bypassed the cache must not write to it either, so a test or a live check can
+        # never replace a verified answer that is already cached.
+        db.create_run(run_id, cid, data, rhash, {**versions, "cache_write": not no_cache}, inject_context(),
+                      current_trace_id())
         enqueue_research(run_id, 0)
     SUBMIT.labels("accepted").inc()
     log(logger, logging.INFO, "run accepted", run_id=run_id, client=cid)

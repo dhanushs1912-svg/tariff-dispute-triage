@@ -26,7 +26,7 @@ from ..contracts import HT_CATEGORIES, LT_CATEGORIES
 from ..llm import LLMBadOutput, LLMUnavailable
 from ..metrics import AGENT_LAT, AGENT_RUNS, AGENT_STEPS, AGENT_TOOLS, GUARD, TOOL_CALLS
 from ..obs import correlation_id, current_agent, extract_context, log, tracer
-from ..retrieval import get_store
+from ..retrieval import get_store, search_documents
 from .common import StepRecorder
 
 logger = logging.getLogger("researcher")
@@ -317,7 +317,7 @@ def build_graph(rec: StepRecorder, versions: dict | None = None):
             return {"scratch": scratch, "draft": draft}
 
         tools = {
-            "search_corpus": lambda query, doc=None, k=5, mode=None, **_: store.search(
+            "search_corpus": lambda query, doc=None, k=5, mode=None, **_: search_documents(
                 str(query), k=int(k or 5), mode=(mode or state.get("feedback", {}).get("mode") or "hybrid")
                 if mode in (None, "hybrid", "keyword", "dense") else "hybrid", doc=doc),
             "get_clause": lambda ref, **_: store.get_clause(str(ref)),

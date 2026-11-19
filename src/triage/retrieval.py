@@ -200,15 +200,22 @@ class CorpusStore:
 
 
 class HybridRetriever(BaseRetriever):
-    """LangChain retriever over CorpusStore; used by the evaluation harness and the baseline pipeline."""
+    """LangChain retriever over CorpusStore. The research agent's search_corpus tool runs through it."""
 
     store: object
     k: int = 5
     mode: str = "hybrid"
+    doc: str | None = None
 
     def _get_relevant_documents(self, query: str, *, run_manager: CallbackManagerForRetrieverRun) -> list[Document]:
         return [Document(page_content=p["text"], metadata={k: v for k, v in p.items() if k != "text"})
-                for p in self.store.search(query, k=self.k, mode=self.mode)]
+                for p in self.store.search(query, k=self.k, mode=self.mode, doc=self.doc)]
+
+
+def search_documents(query: str, k: int = 5, mode: str = "hybrid", doc: str | None = None) -> list[dict]:
+    """Run a search through the LangChain retriever and return passages as plain dicts."""
+    docs = HybridRetriever(store=get_store(), k=k, mode=mode, doc=doc).invoke(query)
+    return [{**d.metadata, "text": d.page_content} for d in docs]
 
 
 _store: CorpusStore | None = None

@@ -21,7 +21,7 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from .. import db, guardrails, prompts
-from ..cache import index_version, request_hash, run_cache_put
+from ..cache import run_cache_put
 from ..config import settings
 from ..llm import LLMBadOutput, LLMUnavailable
 from ..metrics import (AGENT_LAT, AGENT_RUNS, AGENT_STEPS, ESCALATIONS, GUARD, LIVE_LAST, LIVE_SCORE, ROUTES,
@@ -228,8 +228,9 @@ def finalize(rec: StepRecorder, state: State, final: State) -> dict:
     RUN_COST.observe(cost)
     if escalated and esc:
         ESCALATIONS.labels(esc["reason"]).inc()
-    if settings().run_cache_enabled and (not escalated or (esc or {}).get("reason") in CACHEABLE_ESCALATIONS):
-        key = request_hash(run["request"], run.get("prompt_versions") or {}, index_version())
+    cache_write = (run.get("prompt_versions") or {}).get("cache_write", True)
+    if settings().run_cache_enabled and cache_write and (not escalated or (esc or {}).get("reason") in CACHEABLE_ESCALATIONS):
+        key = run["request_hash"]
         run_cache_put(key, result)
     if not escalated and random.random() < settings().live_score_sample_rate:
         _live_score(run, result, final, passages)

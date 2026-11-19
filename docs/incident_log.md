@@ -146,3 +146,24 @@ Real failures met while building the system, newest last.
 - **Effect on reported numbers:** the 8 Nov evaluation (report section 5) ran with the bug. Its
   scenarios whose deciding words sit late in a long passage are understated. We did not re-run the
   full evaluation, to keep the free-tier quota for the demonstration.
+
+## 10. A stub test overwrote the cached real answer (19 Nov 2026)
+
+- **What happened:** after a stub-model test of the 4.1 request, the web preset returned the stub's
+  canned answer (citing CoS 4.09) instead of the real verified one.
+- **Cause:** requests sent with `Cache-Control: no-cache` skipped *reading* the whole-run cache but
+  still *wrote* to it when they finished. The cache key also does not record which model answered,
+  so the stub's result replaced the real model's under the same key.
+- **Fix:**
+  - A run that bypasses the cache no longer writes to it (`cache_write: false` is stored with the
+    run).
+  - The verifier now writes under the exact key the API looked up (`runs.request_hash`) instead of
+    recomputing it.
+  - The real verified 4.1 answer was restored from its stored run (no model calls).
+- **Checked:** a stub run with bypass left the cached real answer untouched. A normal request still
+  writes to the cache: the second identical request was served from the cache in 0 ms.
+
+Also fixed the same day: the `HybridRetriever` (LangChain `BaseRetriever`) was defined but the
+agent's `search_corpus` tool called the store directly. The tool now runs through the LangChain
+retriever (`retriever.invoke(query)`), so LangChain orchestrates retrieval in the running system
+(L1).
